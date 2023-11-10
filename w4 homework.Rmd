@@ -1,0 +1,63 @@
+---
+title: "w4 homework"
+author: "Viktoria Pues"
+date: "2023-11-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# week 4 homework 
+
+## task 
+
+1. Read in global gender inequality data
+2. Join the global gender inequality index to spatial data of the World, creating a new column of difference in inequality between 2010 and 2019
+3. Share it with the World on GitHub
+4. Add you repository URL to the circulated spreadsheet
+
+Tip the countrycode R package will be helpful!
+
+Tip the gender inequality has changed in the last year, you will find what you need in the “All composite indices and components time series (1990-2021)” dataset, the metadata file beneath it will explain what the columns are.
+
+
+### laod libraries 
+```{r}
+library(tidyverse)
+library(readr)
+library(dplyr)
+library(countrycode)
+library(janitor)
+library(here) 
+library(tmap)
+library(tmaptools)
+library(sf)
+library(here)
+```
+
+### read in the data 
+global gender inequality data 
+```{r}
+gender_inequality <-read.csv(here("w4 data","HDR21-22_Composite_indices_complete_time_series.csv"), header = TRUE, sep = ",",  
+                         encoding = "latin1")
+```
+spatial data world 
+```{r}
+spatial_data_world <- st_read("/Users/viktoriapues/Documents/casa/GIS/gis_w6-8/w4 data/World_Countries_Generalized/World_Countries_Generalized.shp")
+
+print(spatial_data_world)
+
+```
+### join 
+join on country ID column
+creating a new column of difference in inequality between 2010 and 2019
+
+```{r}
+joined_data <- gender_inequality %>% select(iso3, country, hdi_2010, hdi_2019) %>% mutate(difference_2010_2019 = hdi_2019-hdi_2010) %>% 
+  left_join(.,spatial_data_world,  by = c("country" = "COUNTRYAFF"))
+
+
+```
+
